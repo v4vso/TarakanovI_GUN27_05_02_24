@@ -1,74 +1,160 @@
-﻿public class Unit
+
+
+
+//-------------------------------------------------------------------------------------------
+public class Unit
 {
-    private const float baseDamage = 5f;
-    private Weapon weapon;
-    private Helm helm;
-    private Shell shell;
-    private Boots boots;
-    private float health = 100f;
+    public Unit(string name, float health, 
+        Helm helm, Shell shell, 
+        Boots boots, Weapon weapon, 
+        Interval damageInterval)
+    {
+        Name = name;
+        Health = health;
+        Helm = helm;
+        Shell = shell;
+        Boots = boots;
+        Weapon = weapon;
+        DamageInterval = damageInterval;
+    }
 
-    //
+    public string Name { get; }
+    private float _health;
 
-    public string Name { get; set; }
-    public float Health => health;
-    public float Damage => (weapon != null ? weapon.GetDamage() : 0f) + baseDamage;
+    public float Health
+    {
+        get => _health;
+        set => _health = value < 0 ? 0 : value;
+    }
+
+    //-------------------------------------------------------------------------------------
+
+    public Interval DamageInterval { get; set; }
+
+    public int HealthInt => (int)Math.Floor(Health);
+
+    public float Damage => Weapon != null ? Weapon.Damage + BaseDamage : BaseDamage;
+
     public float Armor
     {
         get
         {
-            float sum = 0f;
-            if (helm != null)
-                sum += helm.Armor;
-            if (shell != null)
-                sum += shell.Armor;
-            if (boots != null)
-                sum += boots.Armor;
-            return MathF.Round(sum, 2);
+            float helmArmor = Helm != null ? Helm.ArmorValue : 0;
+            float shellArmor = Shell != null ? Shell.ArmorValue : 0;
+            float bootsArmor = Boots != null ? Boots.ArmorValue : 0;
+
+            float totalArmor = helmArmor + shellArmor + bootsArmor;
+
+            totalArmor = Math.Clamp(totalArmor, 0, 1);
+
+            return totalArmor;
         }
     }
 
-    //Unit
+    //------------------------------------------------------------------------
 
-    public Unit() : this("Unknown Unit")
+    public float RealHealth => Health * (1f + Armor);
+
+    public bool SetDamage(float value)
     {
+        Health -= value * Armor;
 
+        return Health <= 0f;
     }
 
-    public Unit(string name)
+    private const float BaseDamage = 5;
+    public Weapon Weapon { get; set; }
+    public Helm Helm { get; set; }
+    public Shell Shell { get; set; }
+    public Boots Boots { get; set; }
+
+    //--------------------------------------------------------------------------------
+
+    public Unit() : this("Unknown Unit", 100)
+    {
+    }
+
+    public Unit(string name) : this(name, 100)
+    {
+    }
+
+    public Unit(string name, float health)
     {
         Name = name;
+        Health = health;
     }
 
-    public float RealHealth()
-    {
-        return Health * (1f + Armor);
-    }
-
-    public bool SetDamage(float amt)
-    {
-        health -= amt * Armor;
-        return health <= 0f;
-    }
-
-    //
+    //Equip
 
     public void EquipWeapon(Weapon weapon)
     {
-        this.weapon = weapon;
+        Weapon = weapon;
     }
-
     public void EquipHelm(Helm helm)
     {
-        this.helm = helm;
+        Helm = helm;
     }
 
     public void EquipShell(Shell shell)
     {
-        this.shell = shell;
+        Shell = shell;
     }
 
+    
     public void EquipBoots(Boots boots)
     {
-        this.boots = boots;
+        Boots = boots;
+    }
+
+    //--------------------------------------------------------------------------------
+
+    public struct Interval
+    {
+        public double MinValue { get; }
+        public double MaxValue { get; }
+
+        //Interval
+        //-------------------------------------------------------------------------------------------------
+
+        public Interval(double minValue, double maxValue)
+        {
+            if (minValue > maxValue)
+            {
+       
+                MinValue = maxValue;
+                MaxValue = minValue;
+                Console.WriteLine("Неверный ввод: minValue больше maxValue. Значения поменялись местами.");
+            }
+            else
+            {
+                MinValue = minValue;
+                MaxValue = maxValue;
+            }
+        }
+
+
+        //Interval
+        //-------------------------------------------------------------------------------------------------
+
+        public Interval(double value) : this(value, value)
+        {
+        }
+
+        public double GetRandomNumber()
+        {
+            Random random = new Random();
+            return random.Next((int)MinValue, (int)MaxValue);
+        }
+
+        public double Min => MinValue;
+
+        public double Max => MaxValue;
+
+        public double Average => (MinValue + MaxValue) / 2;
+
+        public override string ToString()
+        {
+            return $"Interval({MinValue}, {MaxValue})";
+        }
     }
 }

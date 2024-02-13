@@ -1,65 +1,118 @@
-﻿public abstract class ArmorPiece
+
+//--------------------------------------------------------------------------------
+
+public class Armor
 {
-    public string Name { get; }
+    private const float MinArmorValue = 0f;
+    private const float MaxArmorValue = 1f;
 
-    private float armor;
+    private readonly string name;
+    private float armorValue;
 
-    //
-    public float Armor
+    public string Name => name;
+
+    public float ArmorValue
     {
-        get
-        {
-            return armor;
-        }
+        get => armorValue;
         set
         {
-            if (value < 0f)
+            armorValue = Math.Clamp(value, MinArmorValue, MaxArmorValue);
+            if (armorValue != value)
             {
-                armor = 0f;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Значение не может быть меньше 0. Броня установлена на 0.");
-            }
-            else if (value > 1f)
-            {
-                armor = 1f;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Значение не может быть больше 1. Броня установлена на 1.");
-            }
-            else
-            {
-                armor = value;
+                Console.WriteLine("Указано неверное значение брони. Значение настройки в диапазоне от 0 до 1.");
             }
         }
     }
 
-    //
+    //--------------------------------------------------------------------------------
 
-    protected ArmorPiece(string name, float armor)
+    public Armor(string name)
     {
-        Name = name;
-        Armor = armor;
+        this.name = name;
+        InitializeArmorValue();
+    }
+
+    private void InitializeArmorValue()
+    {
+        switch (name.ToLower())
+        {
+            case "helm":
+                armorValue = new Helm().ArmorValue;
+                break;
+
+            case "shell":
+                armorValue = new Shell().ArmorValue;
+                break;
+
+            case "boots":
+                armorValue = new Boots().ArmorValue;
+                break;
+
+            default:
+                Console.WriteLine("Неверное имя брони. Установка значения по умолчанию.");
+                armorValue = 0.5f;
+                break;
+        }
     }
 }
 
-//Helm,Shell,Boots
+//--------------------------------------------------------------------------------
 
-public class Helm : ArmorPiece
+public class Helm
 {
-    public Helm(float armor) : base("Helm", armor)
+    public Helm(float helmArmor)
     {
+        ArmorValue = helmArmor;
+    }
+    public float ArmorValue { get; private set; }
+
+    public Helm()
+    {
+        ArmorValue = 0.5f;
     }
 }
 
-public class Shell : ArmorPiece
+public class Shell
 {
-    public Shell(float armor) : base("Shell", armor)
+    public Shell(float shellArmor)
     {
+        ArmorValue = shellArmor;
+    }
+
+    public float ArmorValue { get; private set; }
+
+    public Shell()
+    {
+        ArmorValue = 0.8f;
     }
 }
 
-public class Boots : ArmorPiece
+public class Boots
 {
-    public Boots(float armor) : base("Boots", armor)
+    public Boots(float bootsArmor)
     {
+        ArmorValue = bootsArmor;
+    }
+
+    public float ArmorValue { get; private set; }
+
+    public Boots()
+    {
+        ArmorValue = 0.3f;
+    }
+}
+
+//--------------------------------------------------------------------------------
+
+public static class MathExtensions
+{
+    public static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
+    {
+        if (value.CompareTo(min) < 0)
+            return min;
+        else if (value.CompareTo(max) > 0)
+            return max;
+        else
+            return value;
     }
 }

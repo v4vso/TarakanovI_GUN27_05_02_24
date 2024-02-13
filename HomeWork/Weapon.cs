@@ -1,14 +1,23 @@
-﻿public class Weapon
+
+
+    //--------------------------------------------------------------------------------
+public class Weapon
 {
     public string Name { get; }
-    public float MinDamage { get; private set; }
-    public float MaxDamage { get; private set; }
+    private float _minDamage;
+    private float _maxDamage;
+    private Random _random;
 
-    //
+    public float MinDamage => _minDamage;
+    public float MaxDamage => _maxDamage;
+    public float Damage => MinDamage + MaxDamage;
+
+    //--------------------------------------------------------------------------------
 
     public Weapon(string name)
     {
         Name = name;
+        _random = new Random();
     }
 
     public Weapon(string name, float minDamage, float maxDamage) : this(name)
@@ -16,41 +25,41 @@
         SetDamageParams(minDamage, maxDamage);
     }
 
-    //
+    public Weapon(string name, float damage) : this(name, damage, damage)
+    {
+    }
 
-    public void SetDamageParams(float minDamage, float maxDamage)
+    public Weapon(float minDamage, float maxDamage)
+    {
+        SetDamageParams(minDamage, maxDamage);
+    }
+
+    //--------------------------------------------------------------------------------
+
+    private void SetDamageParams(float minDamage, float maxDamage)
     {
         if (minDamage > maxDamage)
         {
-            var temp = minDamage;
+            Console.WriteLine($"Неправильные входные данные для оружия {Name}. Минимальный урон больше максимального. Значения будут заменены.");
+            float temp = minDamage;
             minDamage = maxDamage;
             maxDamage = temp;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{Name}: Неправильные входные данные, minDamage был больше maxDamage. Значения поменялись местами.");
         }
 
         if (minDamage < 1f)
         {
+            Console.WriteLine($"Принудительная установка минимального значения урона для оружия {Name}.");
             minDamage = 1f;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{Name}: MinDamage был меньше 1. Он был установлен на 1.");
         }
 
-        if (maxDamage <= 1f)
-        {
-            maxDamage = 10f;
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{Name}: MaxDamage был меньше или равен 1. Он был установлен на 10.");
-        }
-
-        MinDamage = minDamage;
-        MaxDamage = maxDamage;
+        _minDamage = minDamage;
+        _maxDamage = maxDamage;
     }
 
-    //GetDamage
+    //--------------------------------------------------------------------------------
 
     public float GetDamage()
     {
-        return (MinDamage + MaxDamage) / 2;
+        return _random.Next((int)MinDamage, (int)MaxDamage);
     }
 }

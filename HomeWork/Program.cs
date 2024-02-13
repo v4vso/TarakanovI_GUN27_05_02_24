@@ -1,4 +1,8 @@
-﻿using System;
+﻿
+//--------------------------------------------------------------------------------
+
+using static Unit;
+
 
 namespace HomeWork
 {
@@ -6,6 +10,8 @@ namespace HomeWork
     {
         static void Main(string[] args)
         {
+
+
             //ASCII
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.BackgroundColor = ConsoleColor.Black;
@@ -37,67 +43,81 @@ namespace HomeWork
             Console.WriteLine("Нажмите любую клавишу для продолжения...");
             Console.Read();
             Console.Clear();
-            //
 
-            Console.BackgroundColor = ConsoleColor.DarkBlue;
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            //--------------------------------------------------------------------------------
             Console.WriteLine("Подготовка к бою:");
 
-            //
+            //--------------------------------------------------------------------------------
 
             Console.WriteLine("Введите имя бойца:");
-            string name = Console.ReadLine();
+            string? name = Console.ReadLine();
 
-            //
+            //--------------------------------------------------------------------------------
 
             Console.WriteLine("Введите начальное здоровье бойца (10-100):");
-            float health = float.Parse(Console.ReadLine());
 
-            //
+            int health = int.Parse(Console.ReadLine());
 
-            Console.WriteLine("Введите значение брони шлема от 0, до 1:");
+            //--------------------------------------------------------------------------------
+
+            Console.WriteLine("Введите значение брони шлема от 0 до 1:");
+
             float helmArmor = float.Parse(Console.ReadLine());
 
-            //
+            //--------------------------------------------------------------------------------
 
-            Console.WriteLine("Введите значение брони кирасы от 0, до 1:");
+            Console.WriteLine("Введите значение брони кирасы от 0 до 1:");
+
             float shellArmor = float.Parse(Console.ReadLine());
 
-            //
+            //--------------------------------------------------------------------------------
 
-            Console.WriteLine("Введите значение брони сапог от 0, до 1:");
+            Console.WriteLine("Введите значение брони сапог от 0 до 1:");
+
             float bootsArmor = float.Parse(Console.ReadLine());
 
-            //
+            //--------------------------------------------------------------------------------
 
             Console.WriteLine("Укажите минимальный урон оружия (0-20):");
-            float minWeaponDamage = float.Parse(Console.ReadLine());
+
+            float minDamage = float.Parse(Console.ReadLine());
+
+            //--------------------------------------------------------------------------------
+
+            Console.WriteLine("Укажите максимальный урон оружия (20-40):");
+
+            float maxDamage = float.Parse(Console.ReadLine());
+
+            //--------------------------------------------------------------------------------
+
+            Unit player = new Unit(name, health, new Helm(helmArmor), new Shell(shellArmor), new Boots(bootsArmor), new Weapon(minDamage, maxDamage), new Interval(15, 25));
 
             //
 
-            Console.WriteLine("Укажите максимальный урон оружия (20-40):");
-            float maxWeaponDamage = float.Parse(Console.ReadLine());
+            Console.WriteLine("Общий показатель брони равен: " + player.Armor);
 
-            //Unit
+            //
+            Console.WriteLine("Фактическое значение здоровья равно: " + player.RealHealth);
 
-            Unit unit = new Unit(name);
-            unit.Name = name;
+            //--------------------------------------------------------------------------------
 
-            Helm helm = new Helm(helmArmor);
-            unit.EquipHelm(helm);
+            Unit unit1 = new Unit("Боец 1", 75, new Helm(helmArmor), new Shell(shellArmor), new Boots(bootsArmor), new Weapon(minDamage, maxDamage), new Interval(10, 27));
+            Unit unit2 = new Unit("Боец 2", 85, new Helm(helmArmor), new Shell(shellArmor), new Boots(bootsArmor), new Weapon(minDamage, maxDamage), new Interval(3, 25));
 
-            Shell shell = new Shell(shellArmor);
-            unit.EquipShell(shell);
+            //--------------------------------------------------------------------------------
 
-            Boots boots = new Boots(bootsArmor);
-            unit.EquipBoots(boots);
+            Console.WriteLine($"Боец 1: {unit1.Name}, Здоровье: {unit1.Health}, Интервал урона: {unit1.DamageInterval.Min}-{unit1.DamageInterval.Max}");
+            Console.WriteLine($"Боец 2: {unit2.Name}, Здоровье: {unit2.Health}, Интервал урона: {unit2.DamageInterval.Min}-{unit2.DamageInterval.Max}");
 
-            Weapon weapon = new Weapon("Оружие игрока", minWeaponDamage, maxWeaponDamage);
-            unit.EquipWeapon(weapon);
+            Combat combat = new Combat();
+            combat.StartCombat(unit1, unit2);
 
-            Console.WriteLine("Общий показатель брони равен: " + unit.Armor);
-            Console.WriteLine("Фактическое значение здоровья равно: " + unit.RealHealth());
-            Console.Read();
+            combat.ShowResults();
+
+
+
+            Console.ReadLine();
+
         }
     }
 }
